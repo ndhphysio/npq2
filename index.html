@@ -284,9 +284,9 @@ html,body{
       text: '頸痛與睡眠',
       explanation: '想問你條頸痛會唔會影響你瞓覺？例如有冇試過因為痛而瞓唔好、或者每晚瞓少咗？',
       options: [
-        { label: '頸痛從不干擾我睡眠', value: 0, explanation: '瞓覺完全冇受頸痛影響。' },
-        { label: '頸痛有時會干擾我睡眠', value: 1, explanation: '間唔中會因為頸痛而影響睡眠。' },
-        { label: '頸痛經常會干擾我睡眠', value: 2, explanation: '經常因為頸痛而瞓得差。' },
+        { label: '頸痛從不干 擾我睡眠', value: 0, explanation: '瞓覺完全冇受頸痛影響。' },
+        { label: '頸痛有時會干 擾我睡眠', value: 1, explanation: '間唔中會因為頸痛而影響睡眠。' },
+        { label: '頸痛經常會干 擾我睡眠', value: 2, explanation: '經常因為頸痛而瞓得差。' },
         { label: '頸痛使我每晚睡眠少於五小時', value: 3, explanation: '因為頸痛，搞到每晚瞓唔夠五個鐘。' },
         { label: '頸痛使我每晚睡眠少於兩小時', value: 4, explanation: '痛到每晚瞓唔夠兩個鐘，嚴重影響休息。' }
       ]
@@ -368,7 +368,7 @@ html,body{
       text: '駕駛',
       explanation: '呢題想問你揸車受唔受頸痛影響？（如果平時健康時都唔會揸車，請揀第一個選項）',
       options: [
-        { label: '我連健康時也不駕駛', value: 'skip', explanation: '你平時健康時都唔會揸車駕駛（此題將不計分並自動略過）。' },
+        { label: '我連健康時也不駕駛', value: 'skip', explanation: '你平時健康時都唔會揸車（此題將不計分並自動略過）。' },
         { label: '我有需要便可以駕駛，不會感到不適', value: 0, explanation: '想揸車就揸車，完全冇不適。' },
         { label: '我有需要便可以駕駛，但會感到不適', value: 1, explanation: '揸到車，但會覺得有少少唔舒服。' },
         { label: '頸部的痛楚或僵直情況有時會限制我駕駛', value: 2, explanation: '頸痛或僵硬間唔中會限制咗你揸車。' },
@@ -426,18 +426,21 @@ html,body{
       var lang = (v.lang || '').toLowerCase();
       var name = (v.name || '').toLowerCase();
 
+      // 1. Look specifically for zh-HK or Cantonese identifiers
       if(lang === 'zh-hk' || lang.indexOf('yue') !== -1 || name.indexOf('cantonese') !== -1 || name.indexOf('粵語') !== -1){
         cantoneseVoice = v;
         break;
       }
     }
 
+    // Fallback search if strict zh-HK wasn't hit immediately, but ensure we avoid explicit Mandarin
     if(!cantoneseVoice){
       for(var i = 0; i < voices.length; i++){
         var v = voices[i];
         var lang = (v.lang || '').toLowerCase();
         var name = (v.name || '').toLowerCase();
         
+        // Skip mandarin designations
         if(lang.indexOf('zh-cn') !== -1 || name.indexOf('mandarin') !== -1 || name.indexOf('普通话') !== -1 || name.indexOf('國語') !== -1){
           continue;
         }
@@ -602,7 +605,7 @@ html,body{
 
     var lines = [
       '非常感謝您完成了這份調查中所有的問題。',
-      '請勿關閉此頁面，並告知您的物理治療師。',
+      '請勿關閉此頁面，並並告知您的物理治療師。',
       '您的總得分是 ' + scoreStr + ' 分。',
       '您的百分比分數是 ' + percentStr + '。'
     ];
