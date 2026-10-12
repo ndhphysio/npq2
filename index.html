@@ -732,7 +732,10 @@ html,body{
     var ts = document.createElement('span');
     ts.textContent = opt.label;
     btn.appendChild(ts);
-    btn.setAttribute('data-speech', opt.label);
+    btn.setAttribute(
+  'data-speech',
+  opt.speech || opt.label
+);
     btn.addEventListener('click', function(){ onAnswer(btn, opt.value); });
     mainRow.appendChild(btn);
 
