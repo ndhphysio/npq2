@@ -83,6 +83,8 @@ html,body{
 }
 .card-btn:hover{background:#ddd;}
 .card-btn.active{background:#ffeaa7;color:#856404;}
+#prev-btn{display:none;background:#dfe6e9;color:#2d3436;}
+#prev-btn:hover{background:#b2bec3;}
 
 /* ── Explanation panel (question level) ── */
 #explanation-panel{
@@ -240,6 +242,7 @@ html,body{
       <div id="question-number"></div>
       <div id="question-text"></div>
       <div class="btn-row">
+        <button class="card-btn" id="prev-btn">⬅️ 返回上一題</button>
         <button class="card-btn" id="replay-btn">🔊 重播</button>
         <button class="card-btn" id="explain-btn">💡 解釋</button>
       </div>
@@ -402,6 +405,7 @@ html,body{
   var elProgressBar  = document.getElementById('progress-bar-fill');
   var elQNum         = document.getElementById('question-number');
   var elQText        = document.getElementById('question-text');
+  var elPrevBtn      = document.getElementById('prev-btn');
   var elReplay       = document.getElementById('replay-btn');
   var elExplainBtn   = document.getElementById('explain-btn');
   var elExplainPanel = document.getElementById('explanation-panel');
@@ -426,21 +430,18 @@ html,body{
       var lang = (v.lang || '').toLowerCase();
       var name = (v.name || '').toLowerCase();
 
-      // 1. Look specifically for zh-HK or Cantonese identifiers
       if(lang === 'zh-hk' || lang.indexOf('yue') !== -1 || name.indexOf('cantonese') !== -1 || name.indexOf('粵語') !== -1){
         cantoneseVoice = v;
         break;
       }
     }
 
-    // Fallback search if strict zh-HK wasn't hit immediately, but ensure we avoid explicit Mandarin
     if(!cantoneseVoice){
       for(var i = 0; i < voices.length; i++){
         var v = voices[i];
         var lang = (v.lang || '').toLowerCase();
         var name = (v.name || '').toLowerCase();
         
-        // Skip mandarin designations
         if(lang.indexOf('zh-cn') !== -1 || name.indexOf('mandarin') !== -1 || name.indexOf('普通话') !== -1 || name.indexOf('國語') !== -1){
           continue;
         }
@@ -702,6 +703,13 @@ html,body{
     elQNum.textContent = '問題 ' + (currentIndex + 1);
     elQText.textContent = q.text;
 
+    // 控制「返回上一題」按鈕：第一題隱藏，第二題或以後顯示
+    if(currentIndex > 0){
+      elPrevBtn.style.display = 'inline-flex';
+    } else {
+      elPrevBtn.style.display = 'none';
+    }
+
     elExplainPanel.style.display = 'none';
     elExplainBtn.classList.remove('active');
     elExplainText.textContent = q.explanation;
@@ -728,13 +736,16 @@ html,body{
 
     var btn = document.createElement('button');
     btn.className = 'answer-btn ' + colorClass;
+
+    // 檢查之前是否已選過此選項，若有則加上 selected 樣式
+    if(answers[currentIndex] !== undefined && answers[currentIndex] === opt.value){
+      btn.classList.add('selected');
+    }
+
     var ts = document.createElement('span');
     ts.textContent = opt.label;
     btn.appendChild(ts);
-    btn.setAttribute(
-  'data-speech',
-  opt.speech || opt.label
-);
+    btn.setAttribute('data-speech', opt.speech || opt.label);
     btn.addEventListener('click', function(){ onAnswer(btn, opt.value); });
     mainRow.appendChild(btn);
 
@@ -793,6 +804,21 @@ html,body{
       if(currentIndex < questions.length) renderQuestion();
       else showResult();
     }, 350);
+  }
+
+  /* ═══════════════════ PREVIOUS QUESTION ═══════════════════ */
+  function prevQuestion(){
+    if(currentIndex <= 0) return;
+    stopRepeatTimer();
+    stopExpLoop();
+    speechSeqId++;
+    if(speechOK) window.speechSynthesis.cancel();
+    clearAllGlow();
+    closeExplanation();
+    closeAllOptionExplanations();
+
+    currentIndex--;
+    renderQuestion();
   }
 
   /* ═══════════════════ RESULT ═══════════════════ */
@@ -866,6 +892,7 @@ html,body{
       }
       elOverlay.addEventListener('click', onOverlayTap);
     }
+    elPrevBtn.addEventListener('click', prevQuestion);
     elReplay.addEventListener('click', function(){
       closeExplanation();
       closeAllOptionExplanations();
